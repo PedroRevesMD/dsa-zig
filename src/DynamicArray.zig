@@ -6,23 +6,44 @@ pub fn DynamicArray(comptime T: type) type {
     return struct {
         const Self = @This();
         items: []T,
-        capacity: usize = 10,
+        capacity: usize,
         allocator: Allocator,
 
-        pub fn init(allocator: Allocator) Self {
-            return Self{ .items = &[_]T{}, .allocator = allocator };
+        pub fn init(allocator: Allocator) !Self {
+            const initialCapacity: i32 = 10;
+            const memory = try allocator.alloc(T, initialCapacity);
+            return Self{ .items = memory[0..0], .allocator = allocator, .capacity = initialCapacity };
         }
 
         pub fn deinit(self: *Self) void {
-            if (self.items.len > 0) {
-                self.allocator.free(self.items);
+            if (self.capacity > 0) {
+                const memory = self.items.ptr[0..self.capacity];
+                self.allocator.free(memory);
             }
+        }
+
+        pub fn append(self: *Self, value: i32) !void {
+            if (self.items.len == self.capacity) {
+                const newCapacity = self.capacity * 2;
+                const oldMemory = self.items.ptr[0..self.capacity];
+                const newSlice = try self.allocator.realloc(oldMemory, newCapacity);
+                self.capacity = newCapacity;
+                self.items.ptr = newSlice.ptr;
+            }
+
+            const newLength = self.items.len + 1;
+            self.items = self.items.ptr[0..newLength];
+            self.items[newLength - 1] = value;
+        }
+
+        pub fn length(self: *Self) i32 {
+            return self.items.len;
         }
     };
 }
 
 test "It should be able to initialize the Dynamic Array" {
-    var array = DynamicArray(i32).init(testing.allocator);
+    var array = try DynamicArray(i32).init(testing.allocator);
     defer array.deinit();
 
     try testing.expectEqual(@as(usize, 0), array.items.len);
@@ -30,13 +51,26 @@ test "It should be able to initialize the Dynamic Array" {
 }
 
 test "It should be able to append a value to the array" {
-    var array = DynamicArray(i32).init(testing.allocator);
+    var array = try DynamicArray(i32).init(testing.allocator);
     defer array.deinit();
 
-    array.append(1);
-    array.append(2);
-    array.append(3);
+    try array.append(1);
+    try array.append(2);
+    try array.append(3);
 
     try testing.expectEqual(@as(usize, 3), array.items.len);
     try testing.expectEqual(@as(i32, 1), array.items[0]);
+}
+
+test "It should be able to return the length of the array" {
+    var array = try DynamicArray(i32).init(testing.allocator);
+    defer array.deinit();
+
+    try array.append(1);
+    try array.append(2);
+    try array.append(3);
+    try array.append(4);
+    try array.append(5);
+
+    try testing.expectEqual(@as(usize, 5), array.items.len);
 }
