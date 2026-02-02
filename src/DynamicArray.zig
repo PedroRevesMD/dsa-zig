@@ -86,7 +86,7 @@ test "It should be able to return the length of the array" {
     try testing.expectEqual(@as(usize, 5), array.items.len);
 }
 
-test "It should be able to delete a value from the first index in the array" {
+test "It should be able to delete a value from the last index in the array" {
     var array = try DynamicArray(i32).init(testing.allocator);
     defer array.deinit();
 
@@ -100,4 +100,21 @@ test "It should be able to delete a value from the first index in the array" {
 
     try testing.expectEqual(@as(?i32, 5), sut);
     try testing.expectEqual(@as(usize, 4), array.items.len);
+}
+
+test "It should be able to delete the first index of the array" {
+    var array = try DynamicArray(i32).init(testing.allocator);
+    defer array.deinit();
+
+    try array.append(1);
+    try array.append(2);
+    try array.append(3);
+    try array.append(4);
+    try array.append(5);
+    try array.append(6);
+
+    const sut = array.shift();
+
+    try testing.expectEqual(@as(?i32, 1), sut);
+    try testing.expectEqual(@as(usize, 5), array.items.len);
 }
