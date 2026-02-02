@@ -50,6 +50,17 @@ pub fn DynamicArray(comptime T: type) type {
             self.items = self.items.ptr[0 .. size - 1];
             return value;
         }
+
+        pub fn shift(self: *Self) ?T {
+            if (self.items.len == 0) {
+                return null;
+            }
+            const size = self.length();
+            const value: T = self.items[0];
+            std.mem.copyForwards(T, self.items[0 .. size - 1], self.items[1..]);
+            self.items.len -= 1;
+            return value;
+        }
     };
 }
 
@@ -117,4 +128,6 @@ test "It should be able to delete the first index of the array" {
 
     try testing.expectEqual(@as(?i32, 1), sut);
     try testing.expectEqual(@as(usize, 5), array.items.len);
+    try testing.expectEqual(@as(i32, 2), array.items[0]);
+    try testing.expectEqual(@as(i32, 3), array.items[1]);
 }
