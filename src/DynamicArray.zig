@@ -36,8 +36,19 @@ pub fn DynamicArray(comptime T: type) type {
             self.items[newLength - 1] = value;
         }
 
-        pub fn length(self: *Self) i32 {
+        pub fn length(self: *Self) usize {
             return self.items.len;
+        }
+
+        pub fn pop(self: *Self) ?T {
+            if (self.items.len == 0) {
+                return null;
+            }
+            const size = self.length();
+            const value: T = self.items[size - 1];
+
+            self.items = self.items.ptr[0 .. size - 1];
+            return value;
         }
     };
 }
@@ -73,4 +84,20 @@ test "It should be able to return the length of the array" {
     try array.append(5);
 
     try testing.expectEqual(@as(usize, 5), array.items.len);
+}
+
+test "It should be able to delete a value from the first index in the array" {
+    var array = try DynamicArray(i32).init(testing.allocator);
+    defer array.deinit();
+
+    try array.append(1);
+    try array.append(2);
+    try array.append(3);
+    try array.append(4);
+    try array.append(5);
+
+    const sut = array.pop();
+
+    try testing.expectEqual(@as(?i32, 5), sut);
+    try testing.expectEqual(@as(usize, 4), array.items.len);
 }
