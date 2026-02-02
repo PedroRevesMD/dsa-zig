@@ -28,3 +28,15 @@ test "It should be able to initialize the Dynamic Array" {
     try testing.expectEqual(@as(usize, 0), array.items.len);
     try testing.expectEqual(@as(usize, 10), array.capacity);
 }
+
+test "It should be able to append a value to the array" {
+    var array = DynamicArray(i32).init(testing.allocator);
+    defer array.deinit();
+
+    array.append(1);
+    array.append(2);
+    array.append(3);
+
+    try testing.expectEqual(@as(usize, 3), array.items.len);
+    try testing.expectEqual(@as(i32, 1), array.items[0]);
+}
