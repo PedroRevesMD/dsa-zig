@@ -10,7 +10,7 @@ pub fn DynamicArray(comptime T: type) type {
         allocator: Allocator,
 
         pub fn init(allocator: Allocator) !Self {
-            const initialCapacity: i32 = 10;
+            const initialCapacity: usize = 10;
             const memory = try allocator.alloc(T, initialCapacity);
             return Self{ .items = memory[0..0], .allocator = allocator, .capacity = initialCapacity };
         }
@@ -41,10 +41,10 @@ pub fn DynamicArray(comptime T: type) type {
         }
 
         pub fn pop(self: *Self) ?T {
-            if (self.items.len == 0) {
+            const size = self.length();
+            if (size == 0) {
                 return null;
             }
-            const size = self.length();
             const value: T = self.items[size - 1];
 
             self.items = self.items.ptr[0 .. size - 1];
@@ -52,14 +52,23 @@ pub fn DynamicArray(comptime T: type) type {
         }
 
         pub fn shift(self: *Self) ?T {
-            if (self.items.len == 0) {
+            const size = self.length();
+            if (size == 0) {
                 return null;
             }
-            const size = self.length();
             const value: T = self.items[0];
             std.mem.copyForwards(T, self.items[0 .. size - 1], self.items[1..]);
             self.items.len -= 1;
             return value;
+        }
+
+        pub fn get(self: *Self, index: usize) ?T {
+            const size = self.length();
+            if (index >= size) {
+                return null;
+            }
+
+            return self.items[index];
         }
     };
 }
@@ -130,4 +139,39 @@ test "It should be able to delete the first index of the array" {
     try testing.expectEqual(@as(usize, 5), array.items.len);
     try testing.expectEqual(@as(i32, 2), array.items[0]);
     try testing.expectEqual(@as(i32, 3), array.items[1]);
+}
+
+test "" {
+    var array = try DynamicArray(i32).init(testing.allocator);
+    defer array.deinit();
+
+    try array.append(1);
+    try array.append(2);
+    try array.append(3);
+    try array.append(4);
+    try array.append(5);
+    try array.append(6);
+
+    const sut = array.shift();
+
+    try testing.expectEqual(@as(?i32, 1), sut);
+    try testing.expectEqual(@as(usize, 5), array.items.len);
+    try testing.expectEqual(@as(i32, 2), array.items[0]);
+    try testing.expectEqual(@as(i32, 3), array.items[1]);
+}
+
+test "It should be able to get an item of the array based on the index" {
+    var array = try DynamicArray(i32).init(testing.allocator);
+    defer array.deinit();
+
+    try array.append(1);
+    try array.append(2);
+    try array.append(3);
+    try array.append(4);
+    try array.append(5);
+    try array.append(6);
+
+    const sut = array.get(2);
+
+    try testing.expectEqual(@as(i32, 3), sut);
 }
