@@ -141,7 +141,7 @@ test "It should be able to delete the first index of the array" {
     try testing.expectEqual(@as(i32, 3), array.items[1]);
 }
 
-test "" {
+test "It should be able to get the element at the first index of the array" {
     var array = try DynamicArray(i32).init(testing.allocator);
     defer array.deinit();
 
