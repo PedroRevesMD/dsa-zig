@@ -201,3 +201,19 @@ test "It should be able to remove the first element of the LinkedList" {
     try testing.expect(linkedlist.head.?.data == 20);
     try testing.expect(linkedlist.tail.?.data == 30);
 }
+
+test "It should be able to remove the last element of A LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.addLast(10);
+    try linkedlist.addLast(20);
+    try linkedlist.addLast(30);
+
+    try linkedlist.removeLast();
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 2), length);
+    try testing.expect(linkedlist.head.?.data == 10);
+    try testing.expect(linkedlist.tail.?.data == 20);
+}
