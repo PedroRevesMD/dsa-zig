@@ -72,7 +72,41 @@ pub fn LinkedList(comptime T: type) type {
 
             self.len += 1;
         }
-        // pub fn remove(self: *Self, value: T) !void {}
+
+        pub fn remove(self: *Self, value: T) !void {
+            if (self.head == null) {
+                return Error.ListEmpty;
+            }
+            var current = self.head;
+            var previous: ?*Node = null;
+
+            while (current) |node| {
+                if (node.data == value) {
+                    if (previous) |prevNode| {
+                        prevNode.next = node.next;
+                        if (node == self.tail) {
+                            self.tail = prevNode;
+                        }
+                    } else {
+                        self.head = node.next;
+
+                        if (self.head == null) {
+                            self.tail = null;
+                        }
+                    }
+
+                    self.allocator.destroy(node);
+                    self.len -= 1;
+                    return;
+                }
+
+                previous = current;
+                current = node.next;
+            }
+
+            return Error.ValueNotFound;
+        }
+
         pub fn peekFirst(self: *Self) ?T {
             if (self.head) |node| {
                 return node.data;
