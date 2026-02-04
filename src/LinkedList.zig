@@ -245,3 +245,31 @@ test "It should be able to remove the last element of A LinkedList" {
     try testing.expect(linkedlist.head.?.data == 10);
     try testing.expect(linkedlist.tail.?.data == 20);
 }
+
+test "It should be able to catch the first element of A LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.add(10);
+    try linkedlist.add(20);
+    try linkedlist.add(30);
+    try linkedlist.add(40);
+    try linkedlist.add(50);
+    try linkedlist.add(60);
+
+    const firstValue = try linkedlist.peekFirst();
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 6), length);
+    try testing.expectEqual(@as(i32, 10), firstValue);
+}
+
+test "It should be able to return a null value when using peekFirst at a LinkedList with no values" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    const value = linkedlist.peekFirst();
+
+    try testing.expectEqual(@as(usize, 0), linkedlist.size());
+    try testing.expectEqual(value == null);
+}
