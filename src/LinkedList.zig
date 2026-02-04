@@ -63,3 +63,16 @@ test "It should be able to return the length of the LinkedList" {
     const length = linkedlist.size();
     try testing.expectEqual(@as(usize, 0), length);
 }
+
+test "It should be able to add an element to a LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.add(10);
+    try linkedlist.add(20);
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 2), length);
+    try testing.expect(linkedlist.head != null);
+    try testing.expect(linkedlist.head.?.data == 10);
+}
