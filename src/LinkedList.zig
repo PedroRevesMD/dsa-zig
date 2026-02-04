@@ -74,7 +74,21 @@ pub fn LinkedList(comptime T: type) type {
         // pub fn peekFirst(self: *Self) !void {}
         // pub fn peekLast(self: *Self) !void {}
         // pub fn removeFirst(self: *Self) !void {}
-        // pub fn indexOf(self: *Self, index: usize) usize {}
+        pub fn indexOf(self: *Self, value: T) !usize {
+            var count: usize = 0;
+            var currentNode = self.head;
+
+            while (currentNode) |node| {
+                if (node.data == value) {
+                    return count;
+                }
+
+                currentNode = node.next;
+                count += 1;
+            }
+
+            return error.ValueNotFound;
+        }
         // pub fn removeLast(self: *Self) void {}
         pub fn size(self: *Self) usize {
             return self.len;
