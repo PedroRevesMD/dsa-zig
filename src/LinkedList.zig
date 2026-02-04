@@ -173,3 +173,19 @@ test "It should be able to return the index of an element inserted on the Linked
 
     try testing.expectEqual(@as(i32, 30), linkedlist.tail.?.data);
 }
+
+test "It should be able to remove the first element of the LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.addLast(10);
+    try linkedlist.addLast(20);
+    try linkedlist.addLast(30);
+
+    try linkedlist.removeFirst();
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 2), length);
+    try testing.expect(linkedlist.head.?.data == 20);
+    try testing.expect(linkedlist.tail.?.data == 30);
+}
