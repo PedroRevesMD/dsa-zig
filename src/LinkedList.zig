@@ -271,5 +271,5 @@ test "It should be able to return a null value when using peekFirst at a LinkedL
     const value = linkedlist.peekFirst();
 
     try testing.expectEqual(@as(usize, 0), linkedlist.size());
-    try testing.expectEqual(value == null);
+    try testing.expect(value == null);
 }
