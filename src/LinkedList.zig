@@ -299,3 +299,29 @@ test "It should be able to return the same value when using peekFirst and peekLa
     try testing.expect(firstValue == 10);
     try testing.expect(secondValue == 10);
 }
+
+test "It should be able to remove an element from the LinkedList given a value" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.add(10);
+    try linkedlist.add(20);
+    try linkedlist.add(30);
+    try linkedlist.add(40);
+    try linkedlist.add(50);
+
+    try linkedlist.remove(50);
+    try linkedlist.remove(30);
+
+    try testing.expectEqual(@as(usize, 3), linkedlist.size());
+    try testing.expect(linkedlist.tail.?.data == 40);
+    try testing.expect(linkedlist.head.?.data == 10);
+}
+
+test "It should be able to return an error when removing an element from an empty LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try testing.expectEqual(@as(usize, 0), linkedlist.size());
+    try testing.expectError(Error.ListEmpty, linkedlist.remove(50));
+}
