@@ -73,8 +73,20 @@ pub fn LinkedList(comptime T: type) type {
             self.len += 1;
         }
         // pub fn remove(self: *Self, value: T) !void {}
-        // pub fn peekFirst(self: *Self) !void {}
-        // pub fn peekLast(self: *Self) !void {}
+        pub fn peekFirst(self: *Self) ?T {
+            if (self.head) |node| {
+                return node.data;
+            }
+
+            return null;
+        }
+        pub fn peekLast(self: *Self) ?T {
+            if (self.tail) |node| {
+                return node.data;
+            }
+
+            return null;
+        }
         pub fn removeFirst(self: *Self) !void {
             const head = self.head orelse return Error.ListEmpty;
             self.head = head.next;
@@ -257,7 +269,7 @@ test "It should be able to catch the first element of A LinkedList" {
     try linkedlist.add(50);
     try linkedlist.add(60);
 
-    const firstValue = try linkedlist.peekFirst();
+    const firstValue = linkedlist.peekFirst();
 
     const length = linkedlist.size();
     try testing.expectEqual(@as(usize, 6), length);
@@ -272,4 +284,18 @@ test "It should be able to return a null value when using peekFirst at a LinkedL
 
     try testing.expectEqual(@as(usize, 0), linkedlist.size());
     try testing.expect(value == null);
+}
+
+test "It should be able to return the same value when using peekFirst and peekLast at a LinkedList with only one element" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.addLast(10);
+
+    const firstValue = linkedlist.peekFirst();
+    const secondValue = linkedlist.peekLast();
+
+    try testing.expectEqual(@as(usize, 1), linkedlist.size());
+    try testing.expect(firstValue == 10);
+    try testing.expect(secondValue == 10);
 }
