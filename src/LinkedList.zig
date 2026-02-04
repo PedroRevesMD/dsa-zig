@@ -76,7 +76,7 @@ pub fn LinkedList(comptime T: type) type {
         // pub fn peekFirst(self: *Self) !void {}
         // pub fn peekLast(self: *Self) !void {}
         pub fn removeFirst(self: *Self) !void {
-            const head = self.head orelse return error.ListEmpty;
+            const head = self.head orelse return Error.ListEmpty;
             self.head = head.next;
 
             if (self.tail == null) {
@@ -85,7 +85,35 @@ pub fn LinkedList(comptime T: type) type {
             self.allocator.destroy(head);
             self.len -= 1;
         }
-        // pub fn removeLast(self: *Self) void {}
+
+        // Função Será O(n) pois teremos que percorrer a LinkedList inteira, estou fazendo uma Single LinkedList. Com isso, ela não
+        // tem noção de qual seria o valor anterior.
+        pub fn removeLast(self: *Self) !void {
+            const length = self.size();
+            if (length == 0) {
+                return Error.ListEmpty;
+            }
+
+            if (self.head == self.tail) {
+                self.allocator.destroy(self.head.?);
+                self.head = null;
+                self.tail = null;
+                self.len = 0;
+                return;
+            }
+
+            var current = self.head.?;
+
+            while (current.next != self.tail) {
+                current = current.next.?;
+            }
+
+            self.allocator.destroy(self.tail.?);
+            self.tail = current;
+            self.tail.?.next = null;
+
+            self.len -= 1;
+        }
         pub fn indexOf(self: *Self, value: T) !usize {
             var count: usize = 0;
             var currentNode = self.head;
