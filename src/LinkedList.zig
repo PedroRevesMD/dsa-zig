@@ -307,7 +307,7 @@ test "It should be able to catch the first element of A LinkedList" {
 
     const length = linkedlist.size();
     try testing.expectEqual(@as(usize, 6), length);
-    try testing.expectEqual(@as(i32, 10), firstValue);
+    try testing.expectEqual(@as(i32, 10), firstValue.?);
 }
 
 test "It should be able to return a null value when using peekFirst at a LinkedList with no values" {
