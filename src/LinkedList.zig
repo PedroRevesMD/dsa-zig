@@ -150,9 +150,12 @@ test "It should be able to return the index of an element inserted on the Linked
     try linkedlist.addLast(30);
 
     const length = linkedlist.size();
-    try testing.expectEqual(@as(usize, 3), length);
-    try testing.expectEqual(@as(usize, 1), linkedlist.indexOf(10));
-    try testing.expectEqual(@as(usize, 2), linkedlist.indexOf(20));
 
-    try testing.expectEqual(@as(usize, 30), linkedlist.tail.?.data);
+    try testing.expectEqual(@as(usize, 3), length);
+    try testing.expectEqual(@as(usize, 0), try linkedlist.indexOf(10));
+    try testing.expectEqual(@as(usize, 1), try linkedlist.indexOf(20));
+    try testing.expectEqual(@as(usize, 2), try linkedlist.indexOf(30));
+    try testing.expectError(error.ValueNotFound, linkedlist.indexOf(100));
+
+    try testing.expectEqual(@as(i32, 30), linkedlist.tail.?.data);
 }
