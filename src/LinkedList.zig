@@ -45,11 +45,34 @@ pub fn LinkedList(comptime T: type) type {
             }
             self.len += 1;
         }
+        pub fn addFirst(self: *Self, value: T) !void {
+            const newNode = try self.allocator.create(Node);
+            newNode.* = .{ .data = value, .next = self.head };
+
+            if (self.tail == null) {
+                self.tail = newNode;
+            }
+
+            self.head = newNode;
+            self.len += 1;
+        }
+        pub fn addLast(self: *Self, value: T) !void {
+            const newNode = try self.allocator.create(Node);
+            newNode.* = .{ .data = value, .next = null };
+
+            if (self.tail) |oldTail| {
+                oldTail.next = newNode;
+                self.tail = newNode;
+            } else {
+                self.head = newNode;
+                self.tail = newNode;
+            }
+
+            self.len += 1;
+        }
         // pub fn remove(self: *Self, value: T) !void {}
         // pub fn peekFirst(self: *Self) !void {}
         // pub fn peekLast(self: *Self) !void {}
-        // pub fn addFirst(self: *Self) void {}
-        // pub fn addLast(self: *Self) void {}
         // pub fn removeFirst(self: *Self) !void {}
         // pub fn indexOf(self: *Self, index: usize) usize {}
         // pub fn removeLast(self: *Self) void {}
@@ -87,4 +110,33 @@ test "It should be able to add an element to a LinkedList" {
     try testing.expectEqual(@as(usize, 2), length);
     try testing.expect(linkedlist.head != null);
     try testing.expect(linkedlist.head.?.data == 10);
+}
+
+test "It should be able to add an element to a LinkedList (Stacked Way)" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.addFirst(10);
+    try linkedlist.addFirst(20);
+    try linkedlist.addFirst(30);
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 3), length);
+    try testing.expect(linkedlist.head != null);
+    try testing.expect(linkedlist.head.?.data == 30);
+    try testing.expect(linkedlist.tail.?.data == 10);
+}
+
+test "It should be able to add an element to the last position of a LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.addLast(10);
+    try linkedlist.addLast(20);
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 2), length);
+    try testing.expect(linkedlist.head != null);
+    try testing.expect(linkedlist.head.?.data == 10);
+    try testing.expect(linkedlist.tail.?.data == 20);
 }
