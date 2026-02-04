@@ -2,6 +2,8 @@ const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
 
+pub const Error = error{ OutOfMemory, ValueNotFound, ListEmpty };
+
 pub fn LinkedList(comptime T: type) type {
     return struct {
         const Self = @This();
@@ -73,7 +75,17 @@ pub fn LinkedList(comptime T: type) type {
         // pub fn remove(self: *Self, value: T) !void {}
         // pub fn peekFirst(self: *Self) !void {}
         // pub fn peekLast(self: *Self) !void {}
-        // pub fn removeFirst(self: *Self) !void {}
+        pub fn removeFirst(self: *Self) !void {
+            const head = self.head orelse return error.ListEmpty;
+            self.head = head.next;
+
+            if (self.tail == null) {
+                self.tail = null;
+            }
+            self.allocator.destroy(head);
+            self.len -= 1;
+        }
+        // pub fn removeLast(self: *Self) void {}
         pub fn indexOf(self: *Self, value: T) !usize {
             var count: usize = 0;
             var currentNode = self.head;
@@ -89,7 +101,7 @@ pub fn LinkedList(comptime T: type) type {
 
             return error.ValueNotFound;
         }
-        // pub fn removeLast(self: *Self) void {}
+
         pub fn size(self: *Self) usize {
             return self.len;
         }
