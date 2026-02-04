@@ -140,3 +140,19 @@ test "It should be able to add an element to the last position of a LinkedList" 
     try testing.expect(linkedlist.head.?.data == 10);
     try testing.expect(linkedlist.tail.?.data == 20);
 }
+
+test "It should be able to return the index of an element inserted on the LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    try linkedlist.addLast(10);
+    try linkedlist.addLast(20);
+    try linkedlist.addLast(30);
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 3), length);
+    try testing.expectEqual(@as(usize, 1), linkedlist.indexOf(10));
+    try testing.expectEqual(@as(usize, 2), linkedlist.indexOf(20));
+
+    try testing.expectEqual(@as(usize, 30), linkedlist.tail.?.data);
+}
