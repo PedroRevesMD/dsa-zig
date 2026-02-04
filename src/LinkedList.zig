@@ -53,3 +53,11 @@ test "It should be able to Initialize an empty LinkedList" {
     try testing.expect(linkedlist.head == null);
     try testing.expect(linkedlist.tail == null);
 }
+
+test "It should be able to return the length of the LinkedList" {
+    var linkedlist = LinkedList(i32).init(testing.allocator);
+    defer linkedlist.deinit();
+
+    const length = linkedlist.size();
+    try testing.expectEqual(@as(usize, 0), length);
+}
