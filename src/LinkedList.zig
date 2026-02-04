@@ -32,7 +32,19 @@ pub fn LinkedList(comptime T: type) type {
             self.tail = null;
             self.len = 0;
         }
-        // pub fn add(self: *Self, value: T) !void {}
+        pub fn add(self: *Self, value: T) !void {
+            const newNode = try self.allocator.create(Node);
+            newNode.* = .{ .data = value, .next = null };
+
+            if (self.tail) |lastNode| {
+                lastNode.next = newNode;
+                self.tail = newNode;
+            } else {
+                self.head = newNode;
+                self.tail = newNode;
+            }
+            self.len += 1;
+        }
         // pub fn remove(self: *Self, value: T) !void {}
         // pub fn peekFirst(self: *Self) !void {}
         // pub fn peekLast(self: *Self) !void {}
