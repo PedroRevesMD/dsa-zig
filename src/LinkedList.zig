@@ -24,13 +24,13 @@ pub fn LinkedList(comptime T: type) type {
             var current = self.head;
             while (current) |node| {
                 const next = node.next;
-                self.allocator.destroy(current);
+                self.allocator.destroy(node);
                 current = next;
             }
 
             self.head = null;
             self.tail = null;
-            self.size = null;
+            self.len = 0;
         }
         // pub fn add(self: *Self, value: T) !void {}
         // pub fn remove(self: *Self, value: T) !void {}
@@ -41,7 +41,9 @@ pub fn LinkedList(comptime T: type) type {
         // pub fn removeFirst(self: *Self) !void {}
         // pub fn indexOf(self: *Self, index: usize) usize {}
         // pub fn removeLast(self: *Self) void {}
-        // pub fn size(self: *Self) usize {}
+        pub fn size(self: *Self) usize {
+            return self.len;
+        }
     };
 }
 
