@@ -1,7 +1,6 @@
 const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
-
 pub fn Stack(comptime T: type) type {
     return struct {
         const Self = @This();
@@ -14,16 +13,35 @@ pub fn Stack(comptime T: type) type {
         }
         pub fn deinit(self: *Self) void {
             if (self.len == 0) return;
-            self.allocator.free(self.items.ptr[0..self.items.len]);
+            self.allocator.free(self.items.ptr[0..self.len]);
             self.len = 0;
             self.items = &.{};
         }
-        // pub fn pop(self: *Self) ?T {}
-        // pub fn push(self: *Self, value: T) ?T {}
-        // pub fn isEmpty(self: *Self) bool {}
-        // pub fn isFull(self: *Self) bool {}
-        // fn grow(self: *Self) bool {}
+        pub fn pop(self: *Self) ?T {
+            if (self.items.len == 0) return null;
+            self.items.len -= 1;
+            return self.items.ptr[self.items.len];
+        }
+        pub fn push(self: *Self, value: T) !void {
+            if (self.items.len >= self.len) {
+                try self.grow();
+            }
 
+            self.items.ptr[self.items.len] = value;
+            self.items.len += 1;
+        }
+
+        pub fn isEmpty(self: *Self) bool {
+            return self.items.len == 0;
+        }
+
+        fn grow(self: *Self) !void {
+            const oldLen = self.items.len;
+            const newCapacity = if (self.len == 0) 8 else self.len * GROWTH_FACTOR;
+            self.items = try self.allocator.realloc(self.items.ptr[0..self.len], newCapacity);
+            self.len = newCapacity;
+            self.items.len = oldLen;
+        }
     };
 }
 
