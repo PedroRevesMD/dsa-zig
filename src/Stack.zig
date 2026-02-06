@@ -34,3 +34,30 @@ test "It should be able to initialize the stack" {
     try testing.expectEqual(@as(usize, 0), stack.len);
     try testing.expectEqual(@as(usize, 0), stack.items.len);
 }
+
+test "It should be able to add values into the stack" {
+    var stack = Stack(i32).init(testing.allocator);
+    defer stack.deinit();
+
+    try stack.push(10);
+    try stack.push(20);
+    try stack.push(30);
+    try stack.push(40);
+
+    try testing.expectEqual(@as(usize, 4), stack.items.len);
+}
+
+test "It should be able to pop the last value inserted in the stack" {
+    var stack = Stack(i32).init(testing.allocator);
+    defer stack.deinit();
+
+    try stack.push(10);
+    try stack.push(20);
+    try stack.push(30);
+    try stack.push(40);
+
+    const lastValue: ?i32 = stack.pop().?;
+
+    try testing.expectEqual(@as(usize, 3), stack.items.len);
+    try testing.expectEqual(@as(i32, 40), lastValue);
+}
