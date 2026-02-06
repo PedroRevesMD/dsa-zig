@@ -51,6 +51,7 @@ test "It should be able to initialize the stack" {
 
     try testing.expectEqual(@as(usize, 0), stack.len);
     try testing.expectEqual(@as(usize, 0), stack.items.len);
+    try testing.expect(stack.isEmpty() == true);
 }
 
 test "It should be able to add values into the stack" {
