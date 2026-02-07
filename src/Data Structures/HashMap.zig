@@ -2,14 +2,37 @@ const std = @import("std");
 const testing = std.testing;
 const Allocator = std.mem.Allocator;
 
-pub fn Hashmap(comptime _: type) type {
+pub fn Hashmap(comptime K: type, comptime V: type) type {
     return struct {
         const Self = @This();
+        const GROWTH_FACTOR: usize = 2;
+
+        buckets: []?*Entry,
+        len: usize,
         allocator: Allocator,
-        pub fn init(allocator: Allocator) Self {
-            return .{ .allocator = allocator };
+
+        const Entry = struct { key: K, value: V, next: ?*Entry };
+
+        pub fn init(allocator: Allocator, initial_cap: usize) !Self {
+            const capacity = if (initial_cap == 0) 10 else initial_cap;
+            const buckets = try allocator.alloc(?*Entry, capacity);
+            for (buckets) |*bucket| {
+                bucket.* = null;
+            }
+
+            return Self{ .buckets = buckets, .allocator = allocator, .len = 0 };
         }
-        // pub fn deinit(se_f: *Self) void {}
+        pub fn deinit(self: *Self) void {
+            for (self.buckets) |bucket| {
+                var current = bucket;
+                while (current) |entry| {
+                    const next = entry.next;
+                    self.allocator.destroy(entry);
+                    current = next;
+                }
+            }
+            self.allocator.free(self.buckets);
+        }
     };
 }
 
