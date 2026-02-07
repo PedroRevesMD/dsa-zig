@@ -76,6 +76,10 @@ pub fn Hashmap(comptime K: type, comptime V: type) type {
 
             return null;
         }
+
+        pub fn contains(self: *Self, key: K) bool {
+            return self.get(key) != null;
+        }
         fn hashKey(key: K) usize {
             if (K == []const u8) {
                 var value = 5381;
