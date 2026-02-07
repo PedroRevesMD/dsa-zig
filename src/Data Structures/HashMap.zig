@@ -151,6 +151,16 @@ test "It should be able to insert a value inside the HashMap" {
     try testing.expect(hashmap.get(200) == null);
 }
 
+test "It should be able to check if a key is inside the hashmap" {
+    var hashmap = try Hashmap(i32, i32).init(testing.allocator, 3);
+    defer hashmap.deinit();
+
+    try hashmap.put(0, 1);
+
+    try testing.expectEqual(@as(usize, 1), hashmap.len);
+    try testing.expect(hashmap.contains(0) == true);
+}
+
 test "It should be able to get a value from the HashMap" {
     var hashmap = try Hashmap(i32, i32).init(testing.allocator, 3);
     defer hashmap.deinit();
