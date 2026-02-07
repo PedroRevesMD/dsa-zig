@@ -150,3 +150,23 @@ test "It should be able to insert a value inside the HashMap" {
     try testing.expectEqual(@as(i32, 2), hashmap.get(1).?);
     try testing.expect(hashmap.get(200) == null);
 }
+
+test "It should be able to get a value from the HashMap" {
+    var hashmap = try Hashmap(i32, i32).init(testing.allocator, 3);
+    defer hashmap.deinit();
+
+    try hashmap.put(0, 1);
+    try hashmap.put(1, 2);
+    try hashmap.put(2, 3);
+    try hashmap.put(3, 4);
+    try hashmap.put(4, 5);
+    try hashmap.put(5, 6);
+    try hashmap.put(6, 7);
+
+    try testing.expectEqual(@as(usize, 7), hashmap.len);
+    try testing.expectEqual(@as(i32, 7), hashmap.get(6).?);
+    try testing.expectEqual(@as(i32, 4), hashmap.get(3).?);
+    try testing.expectEqual(@as(i32, 1), hashmap.get(0).?);
+    try testing.expect(hashmap.get(200) == null);
+    try testing.expect(hashmap.get(100) == null);
+}
