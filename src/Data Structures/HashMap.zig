@@ -51,3 +51,16 @@ test "It should be able to initialize with custom capacity and deinitialize the 
     try testing.expectEqual(@as(usize, 0), hashmap.len);
     try testing.expectEqual(@as(usize, 5), hashmap.buckets.len);
 }
+
+test "It should be able to insert a value inside the HashMap" {
+    var hashmap = try Hashmap(i32, i32).init(testing.allocator, 3);
+    defer hashmap.deinit();
+
+    try hashmap.put(0, 1);
+    try hashmap.put(1, 2);
+
+    try testing.expectEqual(@as(usize, 2), hashmap.len);
+    try testing.expectEqual(@as(i32, 1), hashmap.get(0).?);
+    try testing.expectEqual(@as(i32, 2), hashmap.get(1).?);
+    try testing.expect(hashmap.get(200) == null);
+}
